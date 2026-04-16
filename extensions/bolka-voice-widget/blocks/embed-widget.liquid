@@ -1,17 +1,16 @@
 <script>
-window.voiceBotConfig = {
-  apiKey:'BOLKA-API-1775790087546-1F13489912',
-  aiAgent:'6d9bd958-b16b-4787-8e5f-5c0efba0a181',
-  domainForVoiceAILink:'1e5b2b97-9d88-4de3-a8bc-fcf4f0c1de07',
-  widgetName:'Powered by Bolka',
-  mode:'voice',
-  widgetBgColor:'#1A232D',
-  widgetTextColor:'#FFFFFF',
-  widgetIconType:'voice'
-};
+  fetch('https://shopify-test-chi.vercel.app/api/widget-config')
+    .then(res => res.json())
+    .then(config => {
+      window.voiceBotConfig = config;
+      const script = document.createElement("script");
+      script.src = "https://app.bolka.ai/api/voice-ai-widget/widget.js";
+      document.body.appendChild(script);
+    })
+    .catch(err => {
+      console.error('Bolka config fetch failed:', err);
+    });
 </script>
-
-<script src="https://app.bolka.ai/api/voice-ai-widget/widget.js" async></script>
 
 {% schema %}
 {
