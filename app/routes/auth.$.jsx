@@ -1,6 +1,6 @@
-import { boundary,redirect} from "@shopify/shopify-app-react-router/server";
+import { boundary} from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
-
+import { redirect } from "react-router";
 // export const loader = async ({ request }) => {
 //   await authenticate.admin(request);
 
