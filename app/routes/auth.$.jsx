@@ -6,6 +6,6 @@ export const loader = async ({ request }) => {
   return null;
 };
 
-// export const headers = (headersArgs) => {
-//   return boundary.headers(headersArgs);
-// };
+export const headers = (headersArgs) => {
+  return boundary.headers(headersArgs);
+};
