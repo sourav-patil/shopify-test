@@ -1,32 +1,22 @@
-import { useEffect } from "react";
-import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
-import { boundary } from "@shopify/shopify-app-react-router/server";
 
-export async function loader({ request }) {
+export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
+  const shop = session.shop;
 
-  return {
-    shop: session.shop,
-  };
-}
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: `https://app.bolka.ai/login?shop=${shop}&source=shopify`,
+      "Cache-Control": "no-store",
+    },
+  });
+};
 
 export default function Index() {
-  const { shop } = useLoaderData();
-
-  useEffect(() => {
-    const redirectUrl = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
-    window.location.href = redirectUrl;
-  }, [shop]);
-
   return (
-    <div style={{ padding: 24, textAlign: "center", fontFamily: "Arial" }}>
+    <div style={{ padding: "40px", fontFamily: "Arial", textAlign: "center" }}>
       <h2>Redirecting to Bolka AI...</h2>
-      <p>Please wait while we connect your store.</p>
     </div>
   );
-}
-
-export function headers(headersArgs) {
-  return boundary.headers(headersArgs);
 }
