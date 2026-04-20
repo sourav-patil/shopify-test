@@ -5,17 +5,15 @@ import { login } from "../../shopify.server";
 import { loginErrorMessage } from "./error.server";
 
 export const loader = async ({ request }) => {
-  const errors = loginErrorMessage(await login(request));
-
-  return { errors };
+  const response = await login(request);
+  if (response instanceof Response) return response;
+  return { errors: loginErrorMessage(response) };
 };
 
 export const action = async ({ request }) => {
-  const errors = loginErrorMessage(await login(request));
-
-  return {
-    errors,
-  };
+  const response = await login(request);
+  if (response instanceof Response) return response;
+  return { errors: loginErrorMessage(response) };
 };
 
 export default function Auth() {
@@ -37,7 +35,7 @@ export default function Auth() {
               onChange={(e) => setShop(e.currentTarget.value)}
               autocomplete="on"
               error={errors.shop}
-            ></s-text-field>
+            />
             <s-button type="submit">Log in</s-button>
           </s-section>
         </Form>
