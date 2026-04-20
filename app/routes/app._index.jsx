@@ -12,13 +12,8 @@ export default function Index() {
   const redirectUrl = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
 
   useEffect(() => {
-    // Try parent window first (escapes iframe)
-    try {
-      window.top.location.href = redirectUrl;
-    } catch {
-      // Fallback if cross-origin blocks it
-      window.location.href = redirectUrl;
-    }
+    // _top replaces entire browser tab, escapes iframe completely
+    window.open(redirectUrl, "_top");
   }, [shop]);
 
   return (
