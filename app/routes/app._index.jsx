@@ -4,24 +4,22 @@ import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-  return { shop: session.shop };
+  return Response.json({ shop: session.shop });
 };
 
 export default function Index() {
   const { shop } = useLoaderData();
+  const url = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
 
   useEffect(() => {
-    // Client-side redirect breaks out of iframe properly
-    window.top.location.href = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
-  }, [shop]);
+    window.top.location.href = url;
+  }, []);
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial", textAlign: "center" }}>
+    <div style={{ padding: "40px", fontFamily: "Arial", textAlign: "center" }}>
       <h2>Redirecting to Bolka AI...</h2>
-      <p>If you are not redirected automatically,{" "}
-        <a href={`https://app.bolka.ai/login?shop=${shop}&source=shopify`}>
-          click here
-        </a>.
+      <p>
+        If not redirected, <a href={url}>click here</a>.
       </p>
     </div>
   );
