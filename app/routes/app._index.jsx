@@ -10,12 +10,19 @@ export const loader = async ({ request }) => {
 
 export default function Index() {
   const { shop } = useLoaderData();
-  const shopify = useAppBridge();
+  const app = useAppBridge();
 
   useEffect(() => {
-    shopify.navigate(
-      `https://app.bolka.ai/login?shop=${shop}&source=shopify`
-    );
+    const redirectUrl = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
+    
+    // Method 1 — App Bridge open (correct API)
+    app.dispatch({
+      type: "APP::NAVIGATION::REDIRECT::REMOTE",
+      payload: {
+        url: redirectUrl,
+        newContext: false,
+      },
+    });
   }, [shop]);
 
   return (
