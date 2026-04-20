@@ -1,29 +1,37 @@
-import { redirect } from "react-router";
+import { useEffect } from "react";
+import { useLoaderData } from "react-router-dom";
 import { authenticate } from "../shopify.server";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 
-export const loader = async ({ request }) => {
-  // Verify Shopify session
+export async function loader({ request }) {
   const { session } = await authenticate.admin(request);
 
-  const shop = session.shop;
+  return {
+    shop: session.shop,
+  };
+}
 
-  // Redirect merchant to Bolka dashboard
-  return redirect(
-    `https://app.bolka.ai/login?shop=${shop}&source=shopify`
-  );
-};
-
-// Optional fallback UI (rarely shown)
 export default function Index() {
+  const { shop } = useLoaderData();
+
+  useEffect(() => {
+    const redirectUrl = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
+
+    if (window.top !== window.self) {
+      window.top.location.href = redirectUrl;
+    } else {
+      window.location.href = redirectUrl;
+    }
+  }, [shop]);
+
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
+    <div style={{ padding: 24, textAlign: "center", fontFamily: "Arial" }}>
       <h2>Redirecting to Bolka AI...</h2>
-      <p>If you are not redirected automatically, please wait.</p>
+      <p>Please wait while we connect your store.</p>
     </div>
   );
-};
+}
 
-export const headers = (headersArgs) => {
+export function headers(headersArgs) {
   return boundary.headers(headersArgs);
-};
+}
