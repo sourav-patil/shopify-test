@@ -2,8 +2,6 @@ import { useEffect } from "react";
 import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
 import { boundary } from "@shopify/shopify-app-react-router/server";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { Redirect } from "@shopify/app-bridge/actions";
 
 export async function loader({ request }) {
   const { session } = await authenticate.admin(request);
@@ -15,16 +13,11 @@ export async function loader({ request }) {
 
 export default function Index() {
   const { shop } = useLoaderData();
-  const app = useAppBridge();
 
   useEffect(() => {
-    if (!shop || !app) return;
-
     const redirectUrl = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
-
-    const redirect = Redirect.create(app);
-    redirect.dispatch(Redirect.Action.REMOTE, redirectUrl);
-  }, [shop, app]);
+    window.location.href = redirectUrl;
+  }, [shop]);
 
   return (
     <div style={{ padding: 24, textAlign: "center", fontFamily: "Arial" }}>
