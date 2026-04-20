@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useLoaderData } from "react-router";
-import { useAppBridge } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
@@ -10,19 +9,16 @@ export const loader = async ({ request }) => {
 
 export default function Index() {
   const { shop } = useLoaderData();
-  const app = useAppBridge();
+  const redirectUrl = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
 
   useEffect(() => {
-    const redirectUrl = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
-    
-    // Method 1 — App Bridge open (correct API)
-    app.dispatch({
-      type: "APP::NAVIGATION::REDIRECT::REMOTE",
-      payload: {
-        url: redirectUrl,
-        newContext: false,
-      },
-    });
+    // Try parent window first (escapes iframe)
+    try {
+      window.top.location.href = redirectUrl;
+    } catch {
+      // Fallback if cross-origin blocks it
+      window.location.href = redirectUrl;
+    }
   }, [shop]);
 
   return (
@@ -30,7 +26,7 @@ export default function Index() {
       <h2>Redirecting to Bolka AI...</h2>
       <p>
         If not redirected,{" "}
-        <a href={`https://app.bolka.ai/login?shop=${shop}&source=shopify`}>
+        <a href={redirectUrl} target="_top">
           click here
         </a>.
       </p>
