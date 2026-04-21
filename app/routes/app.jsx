@@ -1,13 +1,19 @@
 import { Outlet, useLoaderData, useRouteError } from "react-router";
-import { boundary } from "@shopify/shopify-app-react-router/server";
+import {
+  boundary,
+  addDocumentResponseHeaders,
+} from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 
-export const loader = async ({ request }) => {
-  return { apiKey: process.env.SHOPIFY_API_KEY || "" };
+export const loader = async () => {
+  return {
+    apiKey: process.env.SHOPIFY_API_KEY || "",
+  };
 };
 
 export default function App() {
   const { apiKey } = useLoaderData();
+
   return (
     <AppProvider apiKey={apiKey}>
       <Outlet />
@@ -20,5 +26,5 @@ export function ErrorBoundary() {
 }
 
 export const headers = (headersArgs) => {
-  return boundary.headers(headersArgs);
+  return addDocumentResponseHeaders(headersArgs);
 };
