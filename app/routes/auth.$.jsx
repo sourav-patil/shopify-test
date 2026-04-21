@@ -1,20 +1,23 @@
-import { LoaderFunctionArgs } from "react-router"; // if you use TypeScript; otherwise you can omit this
-import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 
-export const loader = async ({ request } /*: LoaderFunctionArgs */) => {
-  // 1. Finish Shopify auth and get session + redirect helper
-  const { session, redirect } = await authenticate.admin(request);
+export const loader = async ({ request }) => {
+  try {
+    console.log("AUTH HIT:", request.url);
 
-  // 2. Build your external URL
-  const redirectUrl = `https://app.bolka.ai/login?shop=${encodeURIComponent(
-    session.shop
-  )}&source=shopify`;
+    const { session } = await authenticate.admin(request);
 
-  // 3. Use the redirect helper to send merchant to your website
-  return redirect(redirectUrl);
-};
+    console.log("SESSION SAVED:", session.shop);
 
-export const headers = (headersArgs) => {
-  return boundary.headers(headersArgs);
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: `https://app.bolka.ai/login?shop=${session.shop}&source=shopify`,
+        "Cache-Control": "no-store",
+      },
+    });
+  } catch (error) {
+    if (error instanceof Response) throw error;
+    console.error("AUTH ERROR:", error.message);
+    throw error;
+  }
 };
