@@ -1,9 +1,12 @@
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
+  // This explicitly handles the /auth/callback route
+  // exchanges code for token and saves session to Supabase
   const { session } = await authenticate.admin(request);
   const shop = session.shop;
 
+  // Server side redirect works perfectly for non-embedded
   return new Response(null, {
     status: 302,
     headers: {
@@ -12,11 +15,3 @@ export const loader = async ({ request }) => {
     },
   });
 };
-
-export default function Index() {
-  return (
-    <div style={{ padding: "40px", fontFamily: "Arial", textAlign: "center" }}>
-      <h2>Redirecting to Bolka AI...</h2>
-    </div>
-  );
-}
