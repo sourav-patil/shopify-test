@@ -15,8 +15,8 @@ const shopify = shopifyApp({
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
-    distribution: AppDistribution.AppStore,
-  isEmbeddedApp: false,  
+  distribution: AppDistribution.AppStore,
+  isEmbeddedApp: false,
   future: {
     expiringOfflineAccessTokens: true,
   },
@@ -26,9 +26,13 @@ const shopify = shopifyApp({
 });
 
 export default shopify;
+
 export const apiVersion = ApiVersion.October25;
 export const authenticate = shopify.authenticate;
 export const unauthenticated = shopify.unauthenticated;
 export const login = shopify.login;
 export const registerWebhooks = shopify.registerWebhooks;
 export const sessionStorage = shopify.sessionStorage;
+
+/* IMPORTANT: needed by entry.server.jsx */
+export const addDocumentResponseHeaders = shopify.addDocumentResponseHeaders;
