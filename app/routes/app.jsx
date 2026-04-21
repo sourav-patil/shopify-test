@@ -1,9 +1,10 @@
 import { Outlet, useLoaderData, useRouteError } from "react-router";
 import {
   boundary,
+  
 } from "@shopify/shopify-app-react-router/server";
+// addDocumentResponseHeaders,
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
-import { addDocumentResponseHeaders } from "../shopify.server";
 
 export const loader = async () => {
   return {
@@ -25,6 +26,6 @@ export function ErrorBoundary() {
   return boundary.error(useRouteError());
 }
 
-export const headers = (headersArgs) => {
-  return addDocumentResponseHeaders(headersArgs);
-};
+// export const headers = (headersArgs) => {
+//   return addDocumentResponseHeaders(headersArgs);
+// };
