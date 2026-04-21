@@ -1,23 +1,28 @@
+import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
-  try {
-    console.log("AUTH HIT:", request.url);
+  // This triggers Shopify OAuth and stores session using PrismaSessionStorage
+  const { session } = await authenticate.admin(request);
 
-    const { session } = await authenticate.admin(request);
+  console.log("Shop authenticated:", session.shop);
+  console.log("Access token saved:", session.accessToken);
 
-    console.log("SESSION SAVED:", session.shop);
-
-    return new Response(null, {
-      status: 302,
+  // Temporary response so you can confirm authentication worked
+  return new Response(
+    JSON.stringify({
+      message: "Authentication successful",
+      shop: session.shop,
+    }),
+    {
+      status: 200,
       headers: {
-        Location: `https://app.bolka.ai/login?shop=${session.shop}&source=shopify`,
-        "Cache-Control": "no-store",
+        "Content-Type": "application/json",
       },
-    });
-  } catch (error) {
-    if (error instanceof Response) throw error;
-    console.error("AUTH ERROR:", error.message);
-    throw error;
-  }
+    }
+  );
+};
+
+export const headers = (headersArgs) => {
+  return boundary.headers(headersArgs);
 };
