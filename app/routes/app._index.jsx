@@ -1,14 +1,23 @@
-import { redirect } from "react-router";
+import { useEffect } from "react";
+import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-
-  const redirectUrl = `https://app.bolka.ai/login?shop=${session.shop}&source=shopify`;
-
-  return redirect(redirectUrl);
+  return { shop: session.shop };
 };
 
 export default function Index() {
-  return null;
+  // const { shop } = useLoaderData();
+  // const redirectUrl = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
+
+  // useEffect(() => {
+  //   window.open(redirectUrl, "_top");
+  // }, [shop]);
+
+  return (
+    <div style={{ padding: "40px", fontFamily: "Arial", textAlign: "center" }}>
+      <h2>Redirecting to Bolka AI...</h2>
+    </div>
+  );
 }
