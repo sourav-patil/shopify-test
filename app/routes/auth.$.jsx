@@ -1,12 +1,16 @@
-import { redirect } from "react-router"
-import shopify from "../shopify.server";
+import { unauthenticated } from "../shopify.server";
 
 export const loader = async ({ request }) => {
-  const { session } = await shopify.auth.callback({ request });
+  const { session } = await unauthenticated.auth.callback(request);
 
-  // session.shop → store domain
   const shop = session.shop;
 
-  // redirect to your SaaS login page
-  return redirect(`https://bolka.ai/login?shop=${shop}`);
+  return new Response(
+    `<script>
+      window.top.location.href = "https://bolka.ai/login?shop=${shop}";
+    </script>`,
+    {
+      headers: { "Content-Type": "text/html" },
+    }
+  );
 };
