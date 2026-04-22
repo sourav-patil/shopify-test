@@ -1,28 +1,16 @@
-import { Outlet, useLoaderData, useRouteError } from "react-router";
-
-import { boundary } from "@shopify/shopify-app-react-router/server";
-import { AppProvider } from "@shopify/shopify-app-react-router/react";
-
 export const loader = async () => {
-  return {
-    apiKey: process.env.SHOPIFY_API_KEY || "",
-  };
+  return new Response(
+    "This Shopify app is managed from https://bolka.ai",
+    { status: 200 }
+  );
 };
 
 export default function App() {
-  const { apiKey } = useLoaderData();
-
   return (
-    <AppProvider apiKey={apiKey} isEmbeddedApp={false}>
-      <Outlet />
-    </AppProvider>
+    <div style={{ padding: 40, fontFamily: "Arial" }}>
+      <h2>Bolka AI</h2>
+      <p>This Shopify app is managed from:</p>
+      <a href="https://bolka.ai/login">https://bolka.ai</a>
+    </div>
   );
 }
-
-export function ErrorBoundary() {
-  return boundary.error(useRouteError());
-}
-
-export const headers = (headersArgs) => {
-  return boundary.headers(headersArgs);
-};
