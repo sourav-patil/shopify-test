@@ -17,8 +17,15 @@ const shopify = shopifyApp({
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
   isEmbeddedApp: false, // 👈 your requirement
+    hooks: {
+    afterAuth: async ({ session, admin }) => {
+      console.log("✅ SESSION SAVED:", session.shop);
+      shopify.registerWebhooks({ session });
+    },
+  },
   future: {
     expiringOfflineAccessTokens: true,
+      unstable_newEmbeddedAuthStrategy: false, // disable for non-embedded
   },
   ...(process.env.SHOP_CUSTOM_DOMAIN
     ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }
