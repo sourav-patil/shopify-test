@@ -4,20 +4,16 @@ import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
-  // 🔐 Only authenticate (no redirect here)
-  const { session } = await authenticate.admin(request);
-
+  await authenticate.admin(request);  // ✅ just authenticate, no session destructure
   return {
     apiKey: process.env.SHOPIFY_API_KEY || "",
-    shop: session.shop,
   };
 };
 
 export default function App() {
   const { apiKey } = useLoaderData();
-
   return (
-    <AppProvider apiKey={apiKey}>
+    <AppProvider apiKey={apiKey} isEmbeddedApp={false}>
       <Outlet />
     </AppProvider>
   );
