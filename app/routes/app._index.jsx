@@ -1,4 +1,3 @@
-import { json } from "react-router";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
@@ -7,13 +6,18 @@ export const loader = async ({ request }) => {
 
     console.log("SESSION:", session);
 
-    return json({ shop: session.shop });
+    return new Response(
+      JSON.stringify({ shop: session.shop }),
+      { headers: { "Content-Type": "application/json" } }
+    );
+
   } catch (error) {
     console.log("AUTH FAILED:", error);
 
-    return json({
-      debug: "Auth failed but reload prevented",
-    });
+    return new Response(
+      JSON.stringify({ debug: "Auth failed but reload prevented" }),
+      { headers: { "Content-Type": "application/json" } }
+    );
   }
 };
 
