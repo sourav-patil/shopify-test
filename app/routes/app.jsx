@@ -4,23 +4,19 @@ import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
-  await authenticate.admin(request);
-  return { apiKey: process.env.SHOPIFY_API_KEY || "" };
-};
+  const { session } = await authenticate.admin(request);
 
-export default function App() {
-  const { apiKey } = useLoaderData();
-  return (
-    <AppProvider embedded apiKey={apiKey}>
-      <Outlet />
-    </AppProvider>
-  );
-}
+  const apiKey = process.env.SHOPIFY_API_KEY || "";
 
-export function ErrorBoundary() {
-  return boundary.error(useRouteError());
-}
+  const shop = session.shop;
 
-export const headers = (headersArgs) => {
-  return boundary.headers(headersArgs);
+  // 🔥 REDIRECT LOGIC (safe)
+  const redirectUrl = `https://yourcompany.com/login?shop=${shop}`;
+
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: redirectUrl,
+    },
+  });
 };
