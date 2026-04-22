@@ -16,7 +16,6 @@ const shopify = shopifyApp({
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
-  isEmbeddedApp: false, // because you redirect to bolka.ai
   future: {
     expiringOfflineAccessTokens: true,
   },
