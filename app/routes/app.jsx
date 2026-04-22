@@ -4,19 +4,29 @@ import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
+  // 🔐 Only authenticate (no redirect here)
   const { session } = await authenticate.admin(request);
 
-  const apiKey = process.env.SHOPIFY_API_KEY || "";
+  return {
+    apiKey: process.env.SHOPIFY_API_KEY || "",
+    shop: session.shop,
+  };
+};
 
-  const shop = session.shop;
+export default function App() {
+  const { apiKey } = useLoaderData();
 
-  // 🔥 REDIRECT LOGIC (safe)
-  const redirectUrl = `https://yourcompany.com/login?shop=${shop}`;
+  return (
+    <AppProvider apiKey={apiKey}>
+      <Outlet />
+    </AppProvider>
+  );
+}
 
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: redirectUrl,
-    },
-  });
+export function ErrorBoundary() {
+  return boundary.error(useRouteError());
+}
+
+export const headers = (headersArgs) => {
+  return boundary.headers(headersArgs);
 };
