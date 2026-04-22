@@ -2,7 +2,7 @@
 
 client_id = "c10869326dd1522e99d263e025f26bba"
 name = "bola-chat-bot"
-application_url = "https://shopify-test-chi.vercel.app"
+application_url = "https://shopify-test-chi.vercel.app/auth"
 embedded = false
 
 [build]
