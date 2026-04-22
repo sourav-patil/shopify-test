@@ -1,5 +1,7 @@
-export const loader = async ({ request }) => {
-  console.log("APP LOADED", request.url);
+import { LoaderFunctionArgs } from "react-router";
+import { authenticate } from "../shopify.server";
 
-  return new Response("Debug Mode");
+// Handles /auth and /auth/callback routes
+export const loader = async ({ request }) => {
+  return authenticate.admin(request);
 };
