@@ -22,7 +22,7 @@ const shopify = shopifyApp({
 
   sessionStorage: new PrismaSessionStorage(prisma),
 
-  distribution: AppDistribution.AppStore,
+  distribution: AppDistribution.SingleMerchant,
 
   // 🚨 IMPORTANT
   isEmbeddedApp: false,
