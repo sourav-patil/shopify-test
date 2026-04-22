@@ -1,26 +1,26 @@
+import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
-  try {
-    const { session } = await authenticate.admin(request);
-
-    console.log("SESSION:", session);
-
-    return new Response(
-      JSON.stringify({ shop: session.shop }),
-      { headers: { "Content-Type": "application/json" } }
-    );
-
-  } catch (error) {
-    console.log("AUTH FAILED:", error);
-
-    return new Response(
-      JSON.stringify({ debug: "Auth failed but reload prevented" }),
-      { headers: { "Content-Type": "application/json" } }
-    );
-  }
+  console.log("📦 APP LOADER HIT");
+  
+  const { session } = await authenticate.admin(request);
+  
+  console.log("🟢 SESSION:", session.shop);
+  
+  return {
+    shop: session.shop,
+    token: session.accessToken ? true : false,
+  };
 };
 
-export default function AppIndex() {
-  return <div>Debug Auth Page</div>;
+export default function Index() {
+  const data = useLoaderData();
+  return (
+    <div style={{ padding: 20 }}>
+      <h2>🧪 Auth Debug Screen</h2>
+      <p>Shop: {data.shop}</p>
+      <p>Access Token: {data.token ? "YES" : "NO"}</p>
+    </div>
+  );
 }
