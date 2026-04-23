@@ -1,26 +1,25 @@
+import { useEffect } from "react";
 import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
-  console.log("📦 APP LOADER HIT");
-  
   const { session } = await authenticate.admin(request);
-  
-  console.log("🟢 SESSION:", session.shop);
-  
-  return {
-    shop: session.shop,
-    token: session.accessToken ? true : false,
-  };
+  return { shop: session.shop };
 };
 
 export default function Index() {
-  const data = useLoaderData();
+  const { shop } = useLoaderData();
+  const redirectUrl = `https://app.bolka.ai/login?shop=${shop}&source=shopify`;
+
+  useEffect(() => {
+    // _top replaces entire browser tab, escapes iframe completely
+    window.open(redirectUrl, "_top");
+  }, [shop]);
+
   return (
-    <div style={{ padding: 20 }}>
-      <h2>🧪 Auth Debug Screen</h2>
-      <p>Shop: {data.shop}</p>
-      <p>Access Token: {data.token ? "YES" : "NO"}</p>
+    <div style={{ padding: "40px", fontFamily: "Arial", textAlign: "center" }}>
+      <h2>Redirecting to Bolka AI...</h2>
     </div>
   );
 }
+
