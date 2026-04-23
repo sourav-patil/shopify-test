@@ -1,4 +1,3 @@
-import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
@@ -8,19 +7,16 @@ export const loader = async ({ request }) => {
     console.log("AUTH SUCCESS");
     console.log("SHOP:", session.shop);
     console.log("TOKEN:", session.accessToken);
-    console.log("SESSION FULL:", session);
 
-    return json({
+    return Response.json({
       auth: true,
       shop: session.shop,
-      tokenExists: !!session.accessToken,
-      session,
+      token: !!session.accessToken,
     });
   } catch (error) {
-    console.log("AUTH FAILED");
-    console.log(error);
+    console.log("AUTH FAILED", error);
 
-    return json({
+    return Response.json({
       auth: false,
       error: error.message,
     });
@@ -28,5 +24,5 @@ export const loader = async ({ request }) => {
 };
 
 export default function DebugAuth() {
-  return <div>Check server logs for auth result</div>;
+  return <div>Check server logs</div>;
 }
