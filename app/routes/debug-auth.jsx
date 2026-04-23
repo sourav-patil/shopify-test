@@ -19,6 +19,8 @@ export const loader = async ({ request }) => {
     return Response.json({
       auth: false,
       error: error.message,
+         errorName: error.name,
+      errorStack: error.stack?.split('\n').slice(0,5),  // first 5 lines
     });
   }
 };
