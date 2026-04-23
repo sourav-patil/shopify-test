@@ -1,8 +1,8 @@
+// auth.$.jsx - handles ALL /auth/* routes
 import { authenticate } from "../shopify.server";
 
-// routes/auth.callback.jsx
-
 export const loader = async ({ request }) => {
-  await authenticate.admin(request); // never wrap in try/catch
+  console.log("AUTH.$ HIT:", request.url);
+  await authenticate.admin(request);
   return null;
 };

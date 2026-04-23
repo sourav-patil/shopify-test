@@ -26,24 +26,6 @@ const shopify = shopifyApp({
 
   // 🚨 IMPORTANT
   isEmbeddedApp: false,
-
-  hooks: {
-    afterAuth: async ({ session }) => {
-      console.log("✅ SESSION SAVED:", session.shop);
-
-      // register webhooks if needed
-      await shopify.registerWebhooks({ session });
-
-      // 🔴 redirect merchant to your SaaS login page
-      throw new Response(null, {
-        status: 302,
-        headers: {
-          Location: `https://bolka.ai/login?shop=${session.shop}`,
-        },
-      });
-    },
-  },
-
   future: {
     expiringOfflineAccessTokens: true,
     unstable_newEmbeddedAuthStrategy: false,
