@@ -1,26 +1,17 @@
 import { useLoaderData } from "react-router";
-import { authenticate } from "../shopify.server";
+import { redirect } from "react-router";
 
 export const loader = async ({ request }) => {
-  console.log("📦 APP LOADER HIT");
+  // Session already verified by app.jsx parent
+  // Just do page-specific logic here
   
-  const { session } = await authenticate.admin(request);
+  // Since you want to redirect to bolka.ai after install:
+  const url = new URL(request.url);
+  const shop = url.searchParams.get("shop");
   
-  console.log("🟢 SESSION:", session.shop);
-  
-  return {
-    shop: session.shop,
-    token: session.accessToken ? true : false,
-  };
+  return redirect(`https://bolka.ai/login?shop=${shop}`);
 };
 
 export default function Index() {
-  const data = useLoaderData();
-  return (
-    <div style={{ padding: 20 }}>
-      <h2>🧪 Auth Debug Screen</h2>
-      <p>Shop: {data.shop}</p>
-      <p>Access Token: {data.token ? "YES" : "NO"}</p>
-    </div>
-  );
+  return <div>Redirecting to Bolka...</div>;
 }

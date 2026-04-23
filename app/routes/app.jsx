@@ -1,16 +1,18 @@
-export const loader = async () => {
-  return new Response(
-    "This Shopify app is managed from https://bolka.ai",
-    { status: 200 }
-  );
+import { authenticate } from "../shopify.server";
+import { Outlet } from "react-router";
+
+export const loader = async ({ request }) => {
+  // Just authenticate - this protects ALL child routes
+  const { session } = await authenticate.admin(request);
+  console.log("APP LOADER HIT - shop:", session.shop);
+  return { shop: session.shop };
 };
 
 export default function App() {
   return (
-    <div style={{ padding: 40, fontFamily: "Arial" }}>
-      <h2>Bolka AI</h2>
-      <p>This Shopify app is managed from:</p>
-      <a href="https://bolka.ai/login">https://bolka.ai</a>
+    <div>
+      {/* Outlet renders the child route (app._index.jsx etc) */}
+      <Outlet />
     </div>
   );
 }
