@@ -23,7 +23,15 @@ const shopify = shopifyApp({
   sessionStorage: new PrismaSessionStorage(prisma),
 
   distribution: AppDistribution.SingleMerchant,
-
+hooks: {
+  afterAuth: async ({ session }) => {
+    console.log("🟢 AFTER AUTH FIRED");
+    console.log("🟢 SHOP:", session.shop);
+    console.log("🟢 TOKEN:", session.accessToken);
+    // temporarily remove registerWebhooks to isolate the issue
+    // await shopify.registerWebhooks({ session });
+  },
+},
   // 🚨 IMPORTANT
   isEmbeddedApp: false,
   future: {
