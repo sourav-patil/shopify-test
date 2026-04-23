@@ -1,16 +1,12 @@
-export const loader = async () => {
-  return new Response(
-    "This Shopify app is managed from https://bolka.ai",
-    { status: 200 }
-  );
+import { authenticate } from "../shopify.server";
+import { Outlet } from "react-router";
+
+export const loader = async ({ request }) => {
+  console.log("APP.JSX LOADER HIT");
+  await authenticate.admin(request);
+  return null;
 };
 
 export default function App() {
-  return (
-    <div style={{ padding: 40, fontFamily: "Arial" }}>
-      <h2>Bolka AI</h2>
-      <p>This Shopify app is managed from:</p>
-      <a href="https://bolka.ai/login">https://bolka.ai</a>
-    </div>
-  );
+  return <Outlet />;  // ← this is critical
 }
