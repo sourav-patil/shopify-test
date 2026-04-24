@@ -1,4 +1,4 @@
-import { shopifyApi, LATEST_API_VERSION } from "@shopify/shopify-api";
+import { shopifyApi } from "@shopify/shopify-api";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 
@@ -7,7 +7,7 @@ export const shopify = shopifyApi({
   apiSecretKey: process.env.SHOPIFY_API_SECRET,
   scopes: process.env.SCOPES.split(","),
   hostName: process.env.HOST.replace(/^https?:\/\//, ""),
-  apiVersion: LATEST_API_VERSION,
+  apiVersion: "2024-10",
   isEmbeddedApp: false,
   sessionStorage: new PrismaSessionStorage(prisma),
 });
