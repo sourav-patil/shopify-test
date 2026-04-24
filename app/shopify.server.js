@@ -1,43 +1,16 @@
-import "@shopify/shopify-app-react-router/adapters/node";
-
-import {
-  ApiVersion,
-  AppDistribution,
-  shopifyApp,
-} from "@shopify/shopify-app-react-router/server";
-
+import { shopifyApi, LATEST_API_VERSION } from "@shopify/shopify-api";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 
-const shopify = shopifyApp({
+export const shopify = shopifyApi({
   apiKey: process.env.SHOPIFY_API_KEY,
-  apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
-  apiVersion: ApiVersion.April25,
-
-  scopes: process.env.SCOPES?.split(","),
-
-  appUrl: process.env.SHOPIFY_APP_URL || "",
-
-  authPathPrefix: "/auth",
-
+  apiSecretKey: process.env.SHOPIFY_API_SECRET,
+  scopes: process.env.SCOPES.split(","),
+  hostName: process.env.HOST.replace(/^https?:\/\//, ""),
+  apiVersion: LATEST_API_VERSION,
+  isEmbeddedApp: false,
   sessionStorage: new PrismaSessionStorage(prisma),
- isEmbeddedApp: false,
-distribution: AppDistribution.AppStore, 
-  future: {
-    unstable_newEmbeddedAuthStrategy: true,
-  },
-
-  ...(process.env.SHOP_CUSTOM_DOMAIN
-    ? { customShopDomains: [process.env.SHOP_CUSTOM_DOMAIN] }
-    : {}),
 });
 
-export default shopify;
-
-export const apiVersion = ApiVersion.April25;
-
+// ADD THIS LINE
 export const authenticate = shopify.authenticate;
-export const unauthenticated = shopify.unauthenticated;
-export const login = shopify.login;
-export const registerWebhooks = shopify.registerWebhooks;
-export const sessionStorage = shopify.sessionStorage;
