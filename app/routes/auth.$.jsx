@@ -29,25 +29,36 @@ export const loader = async ({ request, params }) => {
   }
 
   // CALLBACK
-  if (params["*"] === "callback") {
-    try {
-      const { session, headers } = await shopify.auth.callback({
-        rawRequest: request,
-      });
+// CALLBACK
+if (params["*"] === "callback") {
+  try {
+    const { session, headers } = await shopify.auth.callback({
+      rawRequest: request,
+    });
 
-      console.log("Auth success:", session.shop);
+    console.log("Auth success:", session.shop);
+    console.log("Session ID:", session.id);
+    console.log("Access Token:", session.accessToken ? "EXISTS" : "MISSING");
 
-      // ✅ Apply any headers the library set (cookies, etc.)
-      return Response.redirect(
-        `https://app.bolka.ai/login?shop=${session.shop}`,
-        302
-      );
-
-    } catch (error) {
-      console.error("Auth callback error:", error);
-      return new Response(`Auth failed: ${error.message}`, { status: 500 });
+    // ✅ Explicitly verify session was saved to DB
+    const savedSession = await shopify.config.sessionStorage.loadSession(session.id);
+    
+    if (savedSession) {
+      console.log("✅ Session CONFIRMED in database:", savedSession.id);
+    } else {
+      console.error("❌ Session NOT found in database after OAuth!");
     }
+
+    return Response.redirect(
+      `https://app.bolka.ai/login?shop=${session.shop}`,
+      302
+    );
+
+  } catch (error) {
+    console.error("Auth callback error:", error);
+    return new Response(`Auth failed: ${error.message}`, { status: 500 });
   }
+}
 
   return new Response("Route not found", { status: 404 });
 };
