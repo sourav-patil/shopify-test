@@ -29,10 +29,9 @@ export const loader = async ({ request, params }) => {
   }
 
   // CALLBACK
-// CALLBACK
 if (params["*"] === "callback") {
   try {
-    const { session, headers } = await shopify.auth.callback({
+    const { session } = await shopify.auth.callback({
       rawRequest: request,
     });
 
@@ -40,13 +39,21 @@ if (params["*"] === "callback") {
     console.log("Session ID:", session.id);
     console.log("Access Token:", session.accessToken ? "EXISTS" : "MISSING");
 
-    // ✅ Explicitly verify session was saved to DB
+    // ✅ Manually store session and catch any DB error
+    try {
+      const stored = await shopify.config.sessionStorage.storeSession(session);
+      console.log("✅ storeSession result:", stored);
+    } catch (dbError) {
+      console.error("❌ storeSession FAILED:", dbError.message);
+      console.error("Full DB error:", dbError);
+    }
+
+    // Verify it was saved
     const savedSession = await shopify.config.sessionStorage.loadSession(session.id);
-    
     if (savedSession) {
-      console.log("✅ Session CONFIRMED in database:", savedSession.id);
+      console.log("✅ Session CONFIRMED in DB");
     } else {
-      console.error("❌ Session NOT found in database after OAuth!");
+      console.error("❌ Session still NOT in DB after manual store!");
     }
 
     return Response.redirect(

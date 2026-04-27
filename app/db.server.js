@@ -1,20 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 
-let prisma;
-
-if (process.env.NODE_ENV === "production") {
-  prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL,
-      },
+const prisma = globalThis.prisma ?? new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
     },
-  });
-} else {
-  if (!global.prisma) {
-    global.prisma = new PrismaClient();
-  }
-  prisma = global.prisma;
-}
+  },
+});
+
+// ✅ Reuse in both dev AND production on serverless
+globalThis.prisma = prisma;
 
 export default prisma;
