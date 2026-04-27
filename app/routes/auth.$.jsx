@@ -20,7 +20,7 @@ export const loader = async ({ request, params }) => {
       });
 
       // ✅ Just return it — it's already a redirect Response
-      return response;
+      return response; 
 
     } catch (error) {
       console.error("Auth begin error:", error);
