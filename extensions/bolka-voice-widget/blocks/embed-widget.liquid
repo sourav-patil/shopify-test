@@ -1,0 +1,21 @@
+<script>
+  fetch('https://shopify-test-chi.vercel.app/api/widget-config')
+    .then(res => res.json())
+    .then(config => {
+      window.voiceBotConfig = config;
+      const script = document.createElement("script");
+      script.src = "https://app.bolka.ai/api/voice-ai-widget/widget.js";
+      document.body.appendChild(script);
+    })
+    .catch(err => {
+      console.error('Bolka config fetch failed:', err);
+    });
+</script>
+
+{% schema %}
+{
+  "name": "Bolka Voice Widget",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}
