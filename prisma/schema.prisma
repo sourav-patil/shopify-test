@@ -32,3 +32,13 @@ model Session {
   refreshToken        String?
   refreshTokenExpires DateTime?
 }
+
+model ShopifySubscription {
+  shop            String   @id
+  plan            String
+  active          Boolean  @default(false)
+  subscriptionId  String?
+  status          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
