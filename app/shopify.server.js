@@ -25,9 +25,8 @@ export const shopify = shopifyApi({
   apiVersion: "2024-10",
   isEmbeddedApp: false,
   sessionStorage: new PrismaSessionStorage(prisma),
-future: {
-    // ✅ Use the precise library flag to enforce expiring offline tokens
-    v10_expiringOfflineAccessTokens: true, 
+  future: {
+    expiringOfflineAccessTokens: true,
   },
 });
 
