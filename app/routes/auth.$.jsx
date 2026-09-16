@@ -29,40 +29,34 @@ export const loader = async ({ request, params }) => {
   }
 
   // CALLBACK
+// CALLBACK BLOCK INSIDE YOUR ROUTE LOADER
 if (params["*"] === "callback") {
   try {
+    // Clean up the extraction payload config
     const { session } = await shopify.auth.callback({
       rawRequest: request,
     });
 
-    console.log("Auth success:", session.shop);
-    console.log("Session ID:", session.id);
-    console.log("Access Token:", session.accessToken ? "EXISTS" : "MISSING");
+    console.log("Auth success for store:", session.shop);
+    console.log("Token Lifespan (Expires):", session.expires); // 📅 Should log 1 hour from now
+    console.log("Refresh Token Status:", session.refreshToken ? "EXISTS" : "MISSING"); // 🔑 Should log EXISTS
 
-    // ✅ Manually store session and catch any DB error
+    // Manually store session to your Prisma Database
     try {
-      const stored = await shopify.config.sessionStorage.storeSession(session);
-      console.log("✅ storeSession result:", stored);
+      await shopify.config.sessionStorage.storeSession(session);
+      console.log("✅ storeSession updated successfully.");
     } catch (dbError) {
-      console.error("❌ storeSession FAILED:", dbError.message);
-      console.error("Full DB error:", dbError);
-    }
-
-    // Verify it was saved
-    const savedSession = await shopify.config.sessionStorage.loadSession(session.id);
-    if (savedSession) {
-      console.log("✅ Session CONFIRMED in DB");
-    } else {
-      console.error("❌ Session still NOT in DB after manual store!");
+      console.error("❌ storeSession database layout mismatch:", dbError.message);
+      return new Response("Database write failed during token exchange", { status: 500 });
     }
 
     return Response.redirect(
-      `https://app.bolka.ai/login?shop=${session.shop}`,
+      `https://bolka.ai{session.shop}`,
       302
     );
 
   } catch (error) {
-    console.error("Auth callback error:", error);
+    console.error("Auth callback verification error:", error);
     return new Response(`Auth failed: ${error.message}`, { status: 500 });
   }
 }

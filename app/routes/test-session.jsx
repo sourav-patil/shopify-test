@@ -32,6 +32,9 @@ export const loader = async () => {
       shop: session.shop,
       accessTokenExists: !!session.accessToken,
       accessTokenLength: session.accessToken?.length || 0,
+      refreshTokenExists: !!session.refreshToken,
+      refreshTokenExpires: session.refreshTokenExpires,
+      expires: session.expires,
     }),
     {
       status: 200,

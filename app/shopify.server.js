@@ -24,10 +24,10 @@ export const shopify = shopifyApi({
   hostName: process.env.SHOPIFY_APP_URL?.replace(/^https?:\/\//, "") || "",
   apiVersion: "2024-10",
   isEmbeddedApp: false,
-  //  expiringOfflineAccessTokens: true,
   sessionStorage: new PrismaSessionStorage(prisma),
-    future: {
-    expiringOfflineAccessTokens: true, // 👈 Required location
+future: {
+    // ✅ Use the precise library flag to enforce expiring offline tokens
+    v10_expiringOfflineAccessTokens: true, 
   },
 });
 
