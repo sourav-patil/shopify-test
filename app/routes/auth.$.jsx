@@ -4,16 +4,14 @@ export const loader = async ({ request, params }) => {
   const url = new URL(request.url);
   const shop = url.searchParams.get("shop");
 
-  // ==========================================
-  // START AUTHENTICATION FLOW
-  // ==========================================
+  // START AUTH
   if (params["*"] === "login") {
     if (!shop) {
       return new Response("Shop parameter missing", { status: 400 });
     }
 
     try {
-      // auth.begin() returns a native Web API Response object directly
+      // With web-api adapter, auth.begin() returns a Response directly
       const response = await shopify.auth.begin({
         shop,
         callbackPath: "/auth/callback",
@@ -21,65 +19,58 @@ export const loader = async ({ request, params }) => {
         rawRequest: request,
       });
 
+      // ✅ Just return it — it's already a redirect Response
       return response; 
+
     } catch (error) {
       console.error("Auth begin error:", error);
       return new Response(`Auth begin failed: ${error.message}`, { status: 500 });
     }
   }
 
-  // ==========================================
-  // OAUTH CALLBACK PROCESSING
-  // ==========================================
+  // CALLBACK
   if (params["*"] === "callback") {
     try {
-      // ✅ CRITICAL FIX: Pass 'expiring: true' directly into the modern web-api callback method
-      // This explicitly maps to 'expiring=1' on Shopify's OAuth POST body payload.
       const { session } = await shopify.auth.callback({
         rawRequest: request,
-        expiring: true, 
+        expiring: true,
       });
 
-      console.log("---------------- OAUTH SUCCESS ----------------");
-      console.log("Shop Context:", session.shop);
-      console.log("Generated Session ID:", session.id);
-      console.log("Access Token Structure:", session.accessToken ? "PRESENT" : "MISSING");
-      console.log("Short-Lived Expiry Timestamp:", session.expires ? session.expires : "⚠️ NON-EXPIRING FORMAT!");
-      console.log("Refresh Token Structure:", session.refreshToken ? "PRESENT" : "⚠️ MISSING (REQUIRED FOR REFRESH)");
-      console.log("-----------------------------------------------");
+      console.log("Auth success:", session.shop);
+      console.log("Session ID:", session.id);
+      console.log("Access Token:", session.accessToken ? "EXISTS" : "MISSING");
+      console.log("Refresh Token:", session.refreshToken ? "EXISTS" : "MISSING");
+      console.log("Refresh Token Expires:", session.refreshTokenExpires);
 
-      // Stop the flow immediately if the server didn't grant an expiring token layout
-      if (!session.refreshToken) {
-        throw new Error("Shopify returned a legacy non-expiring token layout instead of an offline short-lived token.");
-      }
-
-      // Explicitly commit the new credential structure to Prisma Session Storage
-      try {
-        const stored = await shopify.config.sessionStorage.storeSession(session);
-        console.log("✅ storeSession database write result:", stored);
-      } catch (dbError) {
-        console.error("❌ storeSession database engine execution FAILED:", dbError.message);
-        return new Response(`Session storage write failure: ${dbError.message}`, { status: 500 });
-      }
-
-      // Verify the storage engine committed the entry successfully
-      const savedSession = await shopify.config.sessionStorage.loadSession(session.id);
-      if (savedSession) {
-        console.log("✅ Verification Check: Session successfully confirmed in Prisma.");
-      } else {
-        console.error("❌ Verification Check Error: Session record missing from storage engine following execution.");
-      }
-
-      return Response.redirect(
-        `https://bolka.ai{session.shop}`,
-        302
-      );
-
-    } catch (error) {
-      console.error("Auth callback system mapping error:", error);
-      return new Response(`Auth verification processing failed: ${error.message}`, { status: 500 });
+    // ✅ Manually store session and catch any DB error
+    try {
+      const stored = await shopify.config.sessionStorage.storeSession(session);
+      console.log("✅ storeSession result:", stored);
+    } catch (dbError) {
+      console.error("❌ storeSession FAILED:", dbError.message);
+      console.error("Full DB error:", dbError);
     }
-  }
 
-  return new Response("Route endpoint mapping configuration not found", { status: 404 });
+    // Verify it was saved
+    const savedSession = await shopify.config.sessionStorage.loadSession(session.id);
+    if (savedSession) {
+      console.log("✅ Session CONFIRMED in DB");
+    } else {
+      console.error("❌ Session still NOT in DB after manual store!");
+    }
+
+    return Response.redirect(
+      `https://app.bolka.ai/login?shop=${session.shop}`,
+      302
+    );
+
+  } catch (error) {
+    console.error("Auth callback error:", error);
+    return new Response(`Auth failed: ${error.message}`, { status: 500 });
+  }
+}
+
+  return new Response("Route not found", { status: 404 });
 };
+
+
