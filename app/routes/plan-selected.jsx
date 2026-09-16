@@ -39,7 +39,6 @@ export const loader = async ({ request }) => {
       }
     `);
     const shopGid = shopResponse.data.shop.id;
-console.log("Shop GID:", shopGid);
     // 2b. Verify the subscription via the Partner API (the correct source of truth
     // for Shopify App Pricing — the Admin API's activeSubscriptions is NOT used here)
     const partnerResponse = await fetch(
