@@ -11,7 +11,6 @@ export const loader = async ({ request, params }) => {
     }
 
     try {
-      // With web-api adapter, auth.begin() returns a Response directly
       const response = await shopify.auth.begin({
         shop,
         callbackPath: "/auth/callback",
@@ -19,9 +18,7 @@ export const loader = async ({ request, params }) => {
         rawRequest: request,
       });
 
-      // ✅ Just return it — it's already a redirect Response
-      return response; 
-
+      return response;
     } catch (error) {
       console.error("Auth begin error:", error);
       return new Response(`Auth begin failed: ${error.message}`, { status: 500 });
@@ -29,18 +26,28 @@ export const loader = async ({ request, params }) => {
   }
 
   // CALLBACK
- if (params["*"] === "callback") {
+  if (params["*"] === "callback") {
     try {
-      const { session } = await shopify.auth.callback({ rawRequest: request });
+      const { session } = await shopify.auth.callback({
+        rawRequest: request,
+        expiring: true,
+      });
 
-      // Build Shopify's hosted pricing page URL
+      // ✅ Manually store session — auth.callback() does NOT do this for you
+      try {
+        const stored = await shopify.config.sessionStorage.storeSession(session);
+        console.log("✅ storeSession result:", stored);
+      } catch (dbError) {
+        console.error("❌ storeSession FAILED:", dbError.message);
+        return new Response(`Session storage failed: ${dbError.message}`, { status: 500 });
+      }
+
       const storeHandle = session.shop.replace(".myshopify.com", "");
-      const appHandle = "bolka-ai"; // <-- from shopify.app.toml
+      const appHandle = "bolka-ai"; // from shopify.app.toml
 
       const pricingUrl = `https://admin.shopify.com/store/${storeHandle}/charges/${appHandle}/pricing_plans`;
 
       return Response.redirect(pricingUrl, 302);
-
     } catch (error) {
       console.error("Auth callback error:", error);
       return new Response(`Auth failed: ${error.message}`, { status: 500 });
@@ -49,5 +56,3 @@ export const loader = async ({ request, params }) => {
 
   return new Response("Route not found", { status: 404 });
 };
-
-
